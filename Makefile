@@ -1,0 +1,154 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -g -pthread
+LDFLAGS = -pthread
+
+# Directory structure
+SERVER_DIR = server
+CLIENT_DIR = client
+UTILS_DIR = utils
+
+# Executable names as specified in the homework
+SERVER_EXE = chatserver
+CLIENT_EXE = chatclient
+
+# Object files - UPDATED to include file_transfer.o
+SERVER_OBJS = $(SERVER_DIR)/server.o $(SERVER_DIR)/server_helper.o $(SERVER_DIR)/dynamic_client.o $(SERVER_DIR)/dynamic_room.o $(SERVER_DIR)/file_transfer.o $(UTILS_DIR)/utils.o
+CLIENT_OBJS = $(CLIENT_DIR)/client.o $(CLIENT_DIR)/client_helper.o $(UTILS_DIR)/utils.o
+
+# Valgrind settings
+VALGRIND = valgrind
+VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose
+
+# Default target
+all: $(SERVER_EXE) $(CLIENT_EXE)
+
+# Pattern rule for object files
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Explicit dependencies for header files
+$(SERVER_DIR)/server.o: $(SERVER_DIR)/server.c $(SERVER_DIR)/server_helper.h $(UTILS_DIR)/utils.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(SERVER_DIR)/server_helper.o: $(SERVER_DIR)/server_helper.c $(SERVER_DIR)/server_helper.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(SERVER_DIR)/dynamic_client.o: $(SERVER_DIR)/dynamic_client.c $(SERVER_DIR)/server_helper.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(SERVER_DIR)/dynamic_room.o: $(SERVER_DIR)/dynamic_room.c $(SERVER_DIR)/server_helper.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# NEW: File transfer compilation rule
+$(SERVER_DIR)/file_transfer.o: $(SERVER_DIR)/file_transfer.c $(SERVER_DIR)/server_helper.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(CLIENT_DIR)/client_helper.o: $(CLIENT_DIR)/client_helper.c $(CLIENT_DIR)/client_helper.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(CLIENT_DIR)/client.o: $(CLIENT_DIR)/client.c $(CLIENT_DIR)/client_helper.h $(UTILS_DIR)/utils.h
+	$(CC) $(CFLAGS) -c $< -o $@
+	
+$(UTILS_DIR)/utils.o: $(UTILS_DIR)/utils.c $(UTILS_DIR)/utils.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Build server executable
+$(SERVER_EXE): $(SERVER_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+# Build client executable
+$(CLIENT_EXE): $(CLIENT_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+# Run server
+run-server: $(SERVER_EXE)
+	./$(SERVER_EXE) 5000
+
+# Run client
+run-client: $(CLIENT_EXE)
+	./$(CLIENT_EXE) 127.0.0.1 5000
+
+# Run server with Valgrind to check for memory leaks
+valgrind-server: $(SERVER_EXE)
+	$(VALGRIND) $(VALGRIND_FLAGS) ./$(SERVER_EXE) 5000
+
+# Run client with Valgrind to check for memory leaks
+valgrind-client: $(CLIENT_EXE)
+	$(VALGRIND) $(VALGRIND_FLAGS) ./$(CLIENT_EXE) 127.0.0.1 5000
+
+# File transfer testing targets
+test-client1: $(CLIENT_EXE)
+	cd client1_files && ../$(CLIENT_EXE) 127.0.0.1 5000
+
+test-client2: $(CLIENT_EXE)
+	cd client2_files && ../$(CLIENT_EXE) 127.0.0.1 5000
+
+setup-test-dirs:
+	mkdir -p client1_files client2_files
+	echo "Hello from client1" > client1_files/hello.txt
+	echo "Data from client2" > client2_files/data.txt
+	echo "Picture data" > client1_files/pic.jpg
+	echo "Document content" > client2_files/doc.pdf
+
+# File transfer test environment setup
+setup-file-test: setup-test-dirs
+	@echo "File transfer test environment created!"
+	@echo ""
+	@echo "Testing steps:"
+	@echo "1. Terminal 1: make run-server"
+	@echo "2. Terminal 2: make test-client1    (login as user1)"
+	@echo "3. Terminal 3: make test-client2    (login as user2)"
+	@echo "4. In client1: /sendfile hello.txt user2"
+	@echo "5. In client2: /sendfile data.txt user1"
+	@echo ""
+	@echo "Files available:"
+	@echo "  client1_files/: hello.txt, pic.jpg"
+	@echo "  client2_files/: data.txt, doc.pdf"
+
+# Test file transfer with automatic setup
+test-sendfile: $(SERVER_EXE) $(CLIENT_EXE) setup-test-dirs
+	@echo "Starting file transfer test..."
+	@echo "1. Start server: ./$(SERVER_EXE) 5000"
+	@echo "2. Start client1: cd client1_files && ../$(CLIENT_EXE) 127.0.0.1 5000"
+	@echo "3. Start client2: cd client2_files && ../$(CLIENT_EXE) 127.0.0.1 5000"
+	@echo "4. Test commands:"
+	@echo "   Client1: /sendfile hello.txt user2"
+	@echo "   Client2: /sendfile data.txt user1"
+
+# Clean up compiled files and test directories
+clean:
+	rm -f $(SERVER_EXE) $(CLIENT_EXE)
+	rm -f $(SERVER_DIR)/*.o $(CLIENT_DIR)/*.o $(UTILS_DIR)/*.o
+
+# Clean everything including test directories
+clean-all: clean
+	rm -rf client1_files client2_files
+
+# Clean and rebuild everything
+rebuild: clean all
+
+# Help target to show available commands
+help:
+	@echo "Available targets:"
+	@echo "  all                 - Build both server and client"
+	@echo "  $(SERVER_EXE)       - Build server only"
+	@echo "  $(CLIENT_EXE)       - Build client only"
+	@echo "  run-server          - Build and run server on port 5000"
+	@echo "  run-client          - Build and run client connecting to specified IP"
+	@echo "  valgrind-server     - Run server with Valgrind memory checking"
+	@echo "  valgrind-client     - Run client with Valgrind memory checking"
+	@echo ""
+	@echo "File Transfer Testing:"
+	@echo "  setup-test-dirs     - Create test directories with sample files"
+	@echo "  setup-file-test     - Setup and show testing instructions"
+	@echo "  test-client1        - Run client from client1_files directory"
+	@echo "  test-client2        - Run client from client2_files directory"
+	@echo "  test-sendfile       - Setup test environment and show instructions"
+	@echo ""
+	@echo "Cleanup:"
+	@echo "  clean               - Remove compiled files"
+	@echo "  clean-all           - Remove compiled files and test directories"
+	@echo "  rebuild             - Clean and rebuild everything"
+	@echo "  help                - Show this help message"
+
+.PHONY: all clean clean-all rebuild run-server run-client valgrind-server valgrind-client help setup-test-dirs setup-file-test test-sendfile test-client1 test-client2

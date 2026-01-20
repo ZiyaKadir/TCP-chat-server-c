@@ -1,0 +1,40 @@
+[2025-05-31 23:15:35] [SERVER] === Server logging system initialized ===
+[2025-05-31 23:15:35] [SERVER] Server starting on port 5000
+[2025-05-31 23:15:35] [SERVER] Client management system initialized
+[2025-05-31 23:15:35] [SERVER] Room management system initialized
+[2025-05-31 23:15:35] [SERVER] File transfer queue initialized
+[2025-05-31 23:15:35] [SERVER] Server ready - listening for client connections
+[2025-05-31 23:15:45] [CLIENT] New connection from 127.0.0.1:37844 (socket 5)
+[2025-05-31 23:15:45] [CLIENT] Created handler thread for client 127.0.0.1:37844
+[2025-05-31 23:15:45] [CLIENT] Client connection setup: socket 5 from 127.0.0.1:37844
+[2025-05-31 23:15:45] [CLIENT] Starting login process for client 127.0.0.1:37844
+[2025-05-31 23:15:48] [CLIENT] Login attempt: user 'ziya' from 127.0.0.1:37844, path: /mnt/c/Users/zktok/Desktop/4.grade/CSE344 System Programming/FINAL/FINAL
+[2025-05-31 23:15:48] [CLIENT] User 'ziya' successfully logged in from 127.0.0.1:37844
+[2025-05-31 23:15:48] [CLIENT] Starting message loop for socket 5
+[2025-05-31 23:15:50] [CLIENT] New connection from 127.0.0.1:37860 (socket 6)
+[2025-05-31 23:15:50] [CLIENT] Created handler thread for client 127.0.0.1:37860
+[2025-05-31 23:15:50] [CLIENT] Client connection setup: socket 6 from 127.0.0.1:37860
+[2025-05-31 23:15:50] [CLIENT] Starting login process for client 127.0.0.1:37860
+[2025-05-31 23:15:54] [CLIENT] Login attempt: user 'ali' from 127.0.0.1:37860, path: /mnt/c/Users/zktok/Desktop/4.grade/CSE344 System Programming/FINAL/FINAL
+[2025-05-31 23:15:54] [CLIENT] User 'ali' successfully logged in from 127.0.0.1:37860
+[2025-05-31 23:15:54] [CLIENT] Starting message loop for socket 6
+[2025-05-31 23:15:58] [CLIENT] Client (socket 5) disconnected
+[2025-05-31 23:15:58] [CLIENT] Message loop ended for socket 5
+[2025-05-31 23:15:58] [CLIENT] Cleaning up client connection (socket 5)
+[2025-05-31 23:15:58] [CLIENT] User 'ziya' disconnected from 127.0.0.1:37844
+[2025-05-31 23:15:58] [SERVER] SIGINT received - initiating graceful shutdown
+[2025-05-31 23:15:58] [CLIENT] Cleaning up pending client connection during shutdown
+[2025-05-31 23:15:58] [SERVER] Sending shutdown notification to all connected clients
+[2025-05-31 23:15:58] [SERVER] Checking file transfer queue before shutdown
+[2025-05-31 23:15:58] [SERVER] Shutdown notification sent to 1 clients
+[2025-05-31 23:15:58] [SERVER] Waiting for 1 clients to disconnect gracefully
+[2025-05-31 23:15:58] [CLIENT] Message loop ended for socket 6
+[2025-05-31 23:15:58] [CLIENT] Cleaning up client connection (socket 6)
+[2025-05-31 23:15:58] [CLIENT] User 'ali' disconnected from 127.0.0.1:37860
+[2025-05-31 23:15:59] [SERVER] All clients disconnected gracefully
+[2025-05-31 23:15:59] [SERVER] Emergency cleanup: file transfer queue
+[2025-05-31 23:15:59] [SERVER] Emergency cleanup: client connections
+[2025-05-31 23:15:59] [SERVER] Emergency cleanup: room management
+[2025-05-31 23:15:59] [SERVER] Closing server socket
+[2025-05-31 23:15:59] [SERVER] Graceful shutdown complete
+[2025-05-31 23:15:59] [SERVER] === Server shutting down - logging system cleanup ===
